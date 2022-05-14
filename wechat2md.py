@@ -1,3 +1,4 @@
+from pickle import TRUE
 import sys
 from turtle import title
 from urllib.request import urlopen
@@ -106,24 +107,22 @@ if __name__ == "__main__":
 
     # Add header
     md_content = "# **" + title + "**\n"
-    md_content = md_content + "### " + str(author) + " | " + str(account_name) + "\n\n"
+    md_content = md_content + "### Author: " + str(author) + " | Account: " + str(account_name) + "\n\n"
 
     # Content: make sure find the one in the body
     wrapper = article_div.find("div", {"class": "rich_media_wrp"})
     content_div = wrapper.find("div",  {"id": "js_content"})
 
-    for div in content_div.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'img']):
+    
+    for div in content_div.find_all(recursive=False):
         text = div.get_text().strip()
-        if div.name == 'p':
-            if not text:
+
+        img_div = div.find('img')
+        
+        if img_div:
+            if not DOWNLOAD_PIC or not img_div.has_attr('data-src'):
                 continue
-            if div.parent.name == 'blockquote':
-                text = '> ' + text
-            md_content = md_content + text + '\n\n'
-        elif div.name == 'img':
-            if not DOWNLOAD_PIC or not div.has_attr('data-src'):
-                continue
-            href = div['data-src']
+            href = img_div['data-src']
             res = requests.get(href.strip())
 
             pic_name = uuid.uuid4().hex + '.png'
@@ -148,8 +147,8 @@ if __name__ == "__main__":
         else:
             if not text:
                 continue
-            # default by using h3 for all header tags
-            md_content = md_content + '\n### **' + text + '**\n\n'
+            md_content = md_content + str(div) + "\n\n"
+
     
     if not os.path.isdir("./out"):
         os.mkdir("out")
