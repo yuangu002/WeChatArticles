@@ -147,7 +147,7 @@ if __name__ == "__main__":
         else:
             if not text:
                 continue
-            md_content = md_content + str(div) + "\n\n"
+            md_content = md_content + str(div) + '\n\n' + '<br>'
 
     
     if not os.path.isdir("./out"):
